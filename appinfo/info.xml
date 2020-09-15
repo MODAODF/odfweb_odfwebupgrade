@@ -12,12 +12,10 @@
     <category>tools</category>
     <bugs>http://www.ossii.com.tw</bugs>
     <dependencies>
-        <nextcloud min-version="15" max-version="15"/>
+        <nextcloud min-version="15" max-version="16"/>
     </dependencies>
-    <navigations>
-        <navigation>
-            <name>Odfweb Upgrade</name>
-            <route>odfwebupgrade.page.index</route>
-        </navigation>
-    </navigations>
+
+	<settings>
+		<admin>OCA\OdfwebUpgrade\Settings\Admin</admin>
+	</settings>
 </info>
