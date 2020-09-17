@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	var appName = "odfwebupgrade";
     var msgEl = $('.msg')
     var msgResponse = {
 		status: '',
@@ -11,7 +12,7 @@ $(document).ready(function() {
 		beforeSend: function () {
 			$('#uploadZip').attr('disabled', true);
 			$('.openUpdater').attr('disabled', true);
-			OC.msg.startAction(msgEl, '上傳中...');
+			OC.msg.startAction(msgEl, t(appName, 'Uploading...'));
 		},
 		done: function (e, response) {
 			var resp = response.result;
@@ -28,7 +29,7 @@ $(document).ready(function() {
 			msgResponse.data.message = resp.data.message;
 		},
 		fail: function (e) {
-			msgResponse.data.message = '檔案上傳失敗' + resp.data.message;
+			msgResponse.data.message = t(appName, 'Failed to upload.') + resp.data.message;
 			console.error(e);
 			$('#uploadZip').attr('disabled', false);
 		},
