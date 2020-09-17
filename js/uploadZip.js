@@ -44,7 +44,7 @@ $(document).ready(function() {
 			}).success(function(t) {
 				var e = document.createElement("form");
 				e.setAttribute("method", "post"),
-				e.setAttribute("action", OC.getRootPath()+"/updater/");
+				e.setAttribute("action", OC.getRootPath()+"/updaterOdfweb/");
 
 				var n = document.createElement("input");
 				n.setAttribute("type", "hidden");
