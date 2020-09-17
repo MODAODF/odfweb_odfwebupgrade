@@ -4,20 +4,25 @@ namespace OCA\OdfwebUpgrade\Settings;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\Settings\ISettings;
+use OCP\IURLGenerator;
 
 class Admin implements ISettings {
 	/** @var IConfig */
 	private $config;
+	/** @var IURLGenerator */
+	private $urlGenerator;
 
-	public function __construct(IConfig $config) {
+	public function __construct(IConfig $config, IURLGenerator $urlGenerator) {
 		$this->config = $config;
+		$this->urlGenerator = $urlGenerator;
 	}
 
 	/**
 	 * @return TemplateResponse
 	 */
 	public function getForm(): TemplateResponse {
-		return new TemplateResponse('odfwebupgrade', 'admin', []);
+		$uploadRoute = $this->urlGenerator->linkToRoute('odfwebupgrade.Admin.uploadZip');
+		return new TemplateResponse('odfwebupgrade', 'admin', ['uploadRoute'=>$uploadRoute]);
 	}
 
 	/**

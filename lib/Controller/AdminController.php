@@ -10,7 +10,7 @@ use OCP\IConfig;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\Security\ISecureRandom;
-use OCP\Util;
+use OCP\Files\IRootFolder;
 
 class AdminController extends Controller {
 	/** @var IJobList */
@@ -21,8 +21,8 @@ class AdminController extends Controller {
 	private $config;
 	/** @var ITimeFactory */
 	private $timeFactory;
-	/** @var IL10N */
-	private $l10n;
+	/** @var IRootFolder */
+	private $rootFolder;
 
 	/**
 	 * @param string $appName
@@ -31,7 +31,7 @@ class AdminController extends Controller {
 	 * @param ISecureRandom $secureRandom
 	 * @param IConfig $config
 	 * @param ITimeFactory $timeFactory
-	 * @param IL10N $l10n
+	 * @param IRootFolder $rootFolder
 	 */
 	public function __construct($appName,
 								IRequest $request,
@@ -39,13 +39,13 @@ class AdminController extends Controller {
 								ISecureRandom $secureRandom,
 								IConfig $config,
 								ITimeFactory $timeFactory,
-								IL10N $l10n) {
+								IRootFolder $rootFolder) {
 		parent::__construct($appName, $request);
 		$this->jobList = $jobList;
 		$this->secureRandom = $secureRandom;
 		$this->config = $config;
 		$this->timeFactory = $timeFactory;
-		$this->l10n = $l10n;
+		$this->rootFolder = $rootFolder;
 	}
 
 	/**
@@ -62,4 +62,56 @@ class AdminController extends Controller {
 
 		return new DataResponse($newToken);
 	}
+
+	/**
+	 * @return DataResponse
+	 */
+	public function uploadZip(): DataResponse {
+
+		try {
+			// Check zip
+			$zipFile = $this->request->getUploadedFile('uploadZip');
+			if (!$zipFile) {
+				throw new \Exception('沒有上傳檔案');
+			}
+			if (mime_content_type($zipFile['tmp_name']) !== "application/zip") {
+				throw new \Exception('非 Zip 檔');
+			}
+			if ($zipFile['size'] === 0)  {
+				throw new \Exception('size too small');
+			}
+
+			$folderTmp = '/updaterTmp-' . $this->config->getSystemValue('instanceid');
+
+			// rm old tmp dir
+			if ($this->rootFolder->nodeExists($folderTmp)) {
+				$this->rootFolder->get($folderTmp)->delete();
+			}
+
+			// create Tmp folder
+			$statNewFolder = $this->rootFolder->newFolder($folderTmp);
+			if (!$statNewFolder) {
+				throw new \Exception('can not create tmp folder');
+			}
+
+			// Move upload file into data/updaterTmp/
+			$filePath = 'data/' . $folderTmp . '/' . $zipFile['name'];
+			$statMove = move_uploaded_file($zipFile['tmp_name'], $filePath);
+			if(!$statMove) {
+				throw new \Exception('Could not move_uploaded_file into data/');
+			}
+
+		} catch (\Exception $th) {
+			return new DataResponse([
+				'data' => [ 'message' => $th->getMessage()],
+				'result' => false,
+			]);
+		}
+
+		return new DataResponse([
+			'data' => [ 'message' => 'Zip Uploaded!'],
+			'result' => true,
+		]);
+	}
+
 }

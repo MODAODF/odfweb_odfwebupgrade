@@ -4,10 +4,10 @@ script('odfwebupgrade', 'uploadZip');
 ?>
 <div id="odfwebupgrade" class="section">
     <h3><b>Odfweb <?php p($l->t('Upgrade')) ?></b></h3>
-    <form id="updaterForm" method="post" enctype="multipart/form-data">
+    <form class="uploadForm" method="post" action="<?php p($_['uploadRoute']) ?>" style="display: inline-block;">
         <span style="font-size:15px;"><?php p($l->t('Select a zip file')) ?></span>
-        <input id="updaterSecret" name="updater-secret-input" type="hidden">
-        <input id="zipFile" name="zipFile" type="file" class="uploadButton">
-        <a ref="#" class="button"><?php p($l->t('Open updater')) ?></a>
-    </form>
+		<input id="uploadZip" class="fileupload" name="uploadZip" type="file">
+	</form>
+    <button class="button openUpdater" disabled><?php p($l->t('Open updater')) ?></button>
+    <span class="msg"></span>
 </div>
