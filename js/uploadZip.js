@@ -19,6 +19,8 @@ $(document).ready(function() {
 				msgResponse.status = 'success';
 				$('#uploadZip').attr('disabled', true);
 				$('.openUpdater').attr('disabled', false);
+				canOpenUpdater(resp.data.zipname);
+
 			} else {
 				$('#uploadZip').attr('disabled', false);
 				$('.openUpdater').attr('disabled', true);
@@ -35,21 +37,31 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#odfwebupgrade').on('click', 'button', function() {
-		$.ajax({
-			url: OC.generateUrl("/apps/odfwebupgrade/credentials"),
-        }).success(function(t) {
-            var e = document.createElement("form");
-            e.setAttribute("method", "post"),
-            e.setAttribute("action", OC.getRootPath()+"/updater/");
+	function canOpenUpdater(zipname) {
+		$('#odfwebupgrade').on('click', 'button', function() {
+			$.ajax({
+				url: OC.generateUrl("/apps/odfwebupgrade/credentials"),
+			}).success(function(t) {
+				var e = document.createElement("form");
+				e.setAttribute("method", "post"),
+				e.setAttribute("action", OC.getRootPath()+"/updater/");
 
-            var n = document.createElement("input");
-            n.setAttribute("type", "hidden");
-            n.setAttribute("name", "updater-secret-input");
-            n.setAttribute("value", t);
-            e.appendChild(n);
-            document.body.appendChild(e);
-            e.submit();
+				var n = document.createElement("input");
+				n.setAttribute("type", "hidden");
+				n.setAttribute("name", "updater-secret-input");
+				n.setAttribute("value", t);
+				e.appendChild(n);
+
+				var z = document.createElement("input");
+				z.setAttribute("type", "hidden");
+				z.setAttribute("name", "zipname");
+				z.setAttribute("value", zipname);
+				e.appendChild(z);
+
+				document.body.appendChild(e);
+				e.submit();
+			})
 		})
-	})
+	}
+
 });

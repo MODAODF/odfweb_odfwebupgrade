@@ -109,7 +109,10 @@ class AdminController extends Controller {
 		}
 
 		return new DataResponse([
-			'data' => [ 'message' => 'Zip Uploaded!'],
+			'data' => [
+				'message' => 'Zip Uploaded!',
+				'zipname' => $zipFile['name']
+			],
 			'result' => true,
 		]);
 	}
