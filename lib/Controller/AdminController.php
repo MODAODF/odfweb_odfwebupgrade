@@ -106,7 +106,25 @@ class AdminController extends Controller {
 				throw new \Exception('Unable to move uploaded file into data.');
 			}
 
+			// Compare version
+			$txtContent = file_get_contents(\OC::$SERVERROOT.'/version-odfweb.txt');
+			$currentVersion = $txtContent ? trim($txtContent) : '0.1';
+
+			$zipTxtContent = file_get_contents('zip://' . \OC::$SERVERROOT . '/' . $filePath .'#odfweb/version-odfweb.txt');
+			if ($zipTxtContent) {
+				$updateZipVersion = trim($zipTxtContent);
+				$currentNum = str_replace( '.', '', $currentVersion);
+				$updateZipNum = str_replace( '.', '', $updateZipVersion);
+				if (intval($updateZipNum) < intval($currentNum)) {
+					throw new \Exception('Downgrade is unsupported.');
+				}
+			} else {
+				throw new \Exception('Unable to read odfweb version.');
+			}
 		} catch (\Exception $th) {
+			// delete updaterTmp/
+			$this->rootFolder->get($folderTmp)->delete();
+
 			return new DataResponse([
 				'data' => [ 'message' => $this->l10n->t($th->getMessage())],
 				'result' => false,

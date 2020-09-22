@@ -11,6 +11,8 @@ OC.L10N.register(
     "File too small." : "檔案太小",
     "Unable to create tmp folder." : "無法建立暫存資料夾",
     "Unable to move uploaded file into data." : "無法儲存檔案",
+    "Downgrade is unsupported." : "不支援降級",
+    "Unable to read odfweb version." : "無法取得更新檔版號",
     "Zip uploaded !" : "檔案上傳成功"
 },
 "nplurals=1; plural=0;");
