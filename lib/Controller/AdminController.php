@@ -122,8 +122,11 @@ class AdminController extends Controller {
 				throw new \Exception('Unable to read odfweb version.');
 			}
 		} catch (\Exception $th) {
+
 			// delete updaterTmp/
-			$this->rootFolder->get($folderTmp)->delete();
+			if ($this->rootFolder->nodeExists($folderTmp)) {
+				$this->rootFolder->get($folderTmp)->delete();
+			}
 
 			return new DataResponse([
 				'data' => [ 'message' => $this->l10n->t($th->getMessage())],

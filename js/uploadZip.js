@@ -28,9 +28,11 @@ $(document).ready(function() {
 			}
 			msgResponse.data.message = resp.data.message;
 		},
-		fail: function (e) {
-			msgResponse.data.message = t(appName, 'Failed to upload.') + resp.data.message;
-			console.error(e);
+		fail: function (jqXHR, textStatus, errorThrown) {
+			msgResponse.data.message = t(appName, 'Failed to upload.');
+			console.debug(jqXHR);
+			console.debug(textStatus);
+			console.debug(errorThrown);
 			$('#uploadZip').attr('disabled', false);
 		},
 		always: function() {
