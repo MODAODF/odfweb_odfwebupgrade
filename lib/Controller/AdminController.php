@@ -72,21 +72,29 @@ class AdminController extends Controller {
 	 * @return DataResponse
 	 */
 	public function uploadZip(): DataResponse {
-
+		$folderTmp = '/updaterTmp-' . $this->config->getSystemValue('instanceid');
 		try {
 			// Check zip
 			$zipFile = $this->request->getUploadedFile('uploadZip');
 			if (!$zipFile) {
 				throw new \Exception('No uploaded file.');
 			}
+
+			if ($zipFile['error'] > 0) {
+				$errorMsg = $this->l10n->t('Unable to upload file(%s).', [$zipFile['error']]);
+				if ($zipFile['error'] === 1) {
+					$stmt = 'The uploaded file exceeds the maximum upload size [%s] of your server.';
+					$errorMsg .= $this->l10n->t($stmt, [ini_get('upload_max_filesize')]);
+				}
+				throw new \Exception($errorMsg);
+			}
+
 			if (mime_content_type($zipFile['tmp_name']) !== "application/zip") {
 				throw new \Exception('Please upload a zip file.');
 			}
 			if ($zipFile['size'] === 0)  {
 				throw new \Exception('File too small.');
 			}
-
-			$folderTmp = '/updaterTmp-' . $this->config->getSystemValue('instanceid');
 
 			// rm old tmp dir
 			if ($this->rootFolder->nodeExists($folderTmp)) {

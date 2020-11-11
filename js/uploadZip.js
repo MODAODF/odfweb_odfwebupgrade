@@ -12,7 +12,7 @@ $(document).ready(function() {
 		beforeSend: function () {
 			$('#uploadZip').attr('disabled', true);
 			$('.openUpdater').attr('disabled', true);
-			OC.msg.startAction(msgEl, t(appName, 'Uploading...'));
+			OC.msg.startAction(msgEl, t(appName, 'Verifying the update file...'));
 		},
 		done: function (e, response) {
 			var resp = response.result;
@@ -41,6 +41,7 @@ $(document).ready(function() {
 	});
 
 	function canOpenUpdater(zipname) {
+		$('button.openUpdater').css('background-color', '#ffe19680');
 		$('#odfwebupgrade').on('click', 'button', function() {
 			$.ajax({
 				url: OC.generateUrl("/apps/odfwebupgrade/credentials"),
