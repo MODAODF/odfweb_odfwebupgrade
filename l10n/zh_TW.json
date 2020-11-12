@@ -13,6 +13,7 @@
     "Unable to move uploaded file into data." : "無法儲存檔案",
     "Downgrade is unsupported." : "不支援降級",
     "Unable to read odfweb version." : "無法取得更新檔版號",
+    "Unable to write odfweb version into config." : "無法將版號寫入 Config",
     "Zip uploaded !" : "檔案上傳成功"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

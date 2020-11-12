@@ -53,6 +53,13 @@ class AdminController extends Controller {
 		$this->l10n = $l10n;
 	}
 
+	private function writeConfig() {
+		// 把目前使用的 odfweb 版號資訊寫入 config.php
+		$txtContent = file_get_contents(\OC::$SERVERROOT.'/version-odfweb.txt');
+		$currentVersion_odfweb = $txtContent ? trim($txtContent) : '0.1';
+		\OC::$server->getSystemConfig()->setValue('versionOdfweb', $currentVersion_odfweb);
+	}
+
 	/**
 	 * @return DataResponse
 	 */
@@ -129,6 +136,14 @@ class AdminController extends Controller {
 			} else {
 				throw new \Exception('Unable to read odfweb version.');
 			}
+
+			// 檢查 config.php odfweb 版號
+			$this->writeConfig();
+			$version = \OC::$server->getSystemConfig()->getValue('versionOdfweb', '0.1');
+			if (!$version) {
+				throw new \Exception('Unable to write odfweb version into config.');
+			}
+
 		} catch (\Exception $th) {
 
 			// delete updaterTmp/
