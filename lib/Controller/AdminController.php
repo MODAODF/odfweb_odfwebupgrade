@@ -126,16 +126,16 @@ class AdminController extends Controller {
 			$currentVersion = $txtContent ? trim($txtContent) : '0.1';
 
 			$zipTxtContent = file_get_contents('zip://' . \OC::$SERVERROOT . '/' . $filePath .'#odfweb/version-odfweb.txt');
-			if ($zipTxtContent) {
-				$updateZipVersion = trim($zipTxtContent);
-				$currentNum = str_replace( '.', '', $currentVersion);
-				$updateZipNum = str_replace( '.', '', $updateZipVersion);
-				if (intval($updateZipNum) < intval($currentNum)) {
-					throw new \Exception('Downgrade is unsupported.');
-				}
-			} else {
+			$updateZipVersion = trim($zipTxtContent);
+			if (!$updateZipVersion) {
 				throw new \Exception('Unable to read odfweb version.');
 			}
+			if (version_compare($currentVersion, $updateZipVersion, '>')) {
+				throw new \Exception('Downgrade is unsupported.');
+			}
+			// if (version_compare($currentVersion, $updateZipVersion, '=')) {
+			// 	throw new \Exception('已經是最新版本'); // 版號相同
+			// }
 
 			// 檢查 config.php odfweb 版號
 			$this->writeConfig();
@@ -155,6 +155,12 @@ class AdminController extends Controller {
 				'data' => [ 'message' => $this->l10n->t($th->getMessage())],
 				'result' => false,
 			]);
+		}
+
+		// 更新版號 比 目前版號 大||相同，移除 .step -> 重新跑更新流程
+		if (version_compare($currentVersion, $updateZipVersion, '<=')) {
+			$stepFile = \OC::$SERVERROOT . '/data/updaterOdfweb-' . $this->config->getSystemValue('instanceid') . '/.step';
+			if(file_exists($stepFile))  unlink($stepFile );
 		}
 
 		return new DataResponse([
