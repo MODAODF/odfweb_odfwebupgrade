@@ -133,6 +133,7 @@ class AdminController extends Controller {
 			if (version_compare($currentVersion, $updateZipVersion, '>')) {
 				throw new \Exception('Downgrade is unsupported.');
 			}
+
 			// if (version_compare($currentVersion, $updateZipVersion, '=')) {
 			// 	throw new \Exception('已經是最新版本'); // 版號相同
 			// }
@@ -157,10 +158,31 @@ class AdminController extends Controller {
 			]);
 		}
 
-		// 更新版號 比 目前版號 大||相同，移除 .step -> 重新跑更新流程
-		if (version_compare($currentVersion, $updateZipVersion, '<=')) {
-			$stepFile = \OC::$SERVERROOT . '/data/updaterOdfweb-' . $this->config->getSystemValue('instanceid') . '/.step';
-			if(file_exists($stepFile))  unlink($stepFile );
+		// 檢查需不需要刪除 step
+		$stepFile = \OC::$SERVERROOT . '/data/updaterOdfweb-' . $this->config->getSystemValue('instanceid') . '/.step';
+		if(file_exists($stepFile)) {
+
+			try {
+				// 如果 step 已經是 12-end -> 刪除
+				$state = file_get_contents($stepFile);
+				if ($state === false) throw new \Exception('Could not read from .step');
+
+				$jsonData = json_decode($state, true);
+				if (!is_array($jsonData)) throw new \Exception('Cannot decode .step JSON data.');
+				$stepState = $jsonData['state'];
+				$stepNumber = $jsonData['step'];
+
+				if ($stepNumber === 12 && $stepState === "end") {
+					if(unlink($stepFile) === false) {
+						throw new \Exception('Could not rmdir .step');
+					}
+				}
+			} catch (\Exception $th) {
+				return new DataResponse([
+					'data' => [ 'message' => $this->l10n->t($th->getMessage())],
+					'result' => false,
+				]);
+			}
 		}
 
 		return new DataResponse([

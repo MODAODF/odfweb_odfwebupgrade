@@ -14,6 +14,9 @@
     "Downgrade is unsupported." : "不支援降級",
     "Unable to read odfweb version." : "無法取得更新檔版號",
     "Unable to write odfweb version into config." : "無法將版號寫入 Config",
+    "Could not read from .step" : "無法讀取 .step",
+    "Cannot decode .step JSON data." : "無法解碼 .step 中的 JSON 資料",
+    "Could not rmdir .step" : "無法刪除 .step",
     "Zip uploaded !" : "檔案上傳成功"
 },"pluralForm" :"nplurals=1; plural=0;"
 }
