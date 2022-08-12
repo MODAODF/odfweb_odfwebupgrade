@@ -4,15 +4,15 @@
     <id>odfwebupgrade</id>
     <name>Odfweb Upgrade</name>
     <summary>upgrade odfweb</summary>
-    <description><![CDATA[Update odfweb using a tar.gz file.]]></description>
-    <version>0.1.0</version>
+    <description><![CDATA[Update odfweb using a zip file.]]></description>
+    <version>1.0.1</version>
     <licence>agpl</licence>
     <author mail="sharon.wu@ossii.com.tw" homepage="http://www.ossii.com.tw">sharon wu</author>
     <namespace>OdfwebUpgrade</namespace>
     <category>tools</category>
     <bugs>http://www.ossii.com.tw</bugs>
     <dependencies>
-        <nextcloud min-version="15" max-version="20"/>
+        <nextcloud min-version="24" max-version="24"/>
     </dependencies>
 
 	<settings>
