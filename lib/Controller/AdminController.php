@@ -79,7 +79,6 @@ class AdminController extends Controller {
 	 * @return DataResponse
 	 */
 	public function uploadZip(): DataResponse {
-		$folderTmp = '/updaterTmp-' . $this->config->getSystemValue('instanceid');
 		try {
 			// Check zip
 			$zipFile = $this->request->getUploadedFile('uploadZip');
@@ -103,19 +102,25 @@ class AdminController extends Controller {
 				throw new \Exception('File too small.');
 			}
 
-			// rm old tmp dir
-			if ($this->rootFolder->nodeExists($folderTmp)) {
-				$this->rootFolder->get($folderTmp)->delete();
+			$dataDir = $this->config->getSystemValue('datadirectory', \OC::$SERVERROOT . '/data');
+			$instanceId = $this->config->getSystemValue('instanceid', null);
+			$folderTmpPath = $dataDir . '/updaterTmp-' . $instanceId;
+
+			// rm old Tmp folder
+			if (file_exists($folderTmpPath)) {
+				$this->recursiveDelete($folderTmpPath);
 			}
 
 			// create Tmp folder
-			$statNewFolder = $this->rootFolder->newFolder($folderTmp);
-			if (!$statNewFolder) {
-				throw new \Exception('Unable to create tmp folder.');
+			if (!file_exists($folderTmpPath)) {
+				$result = mkdir($folderTmpPath);
+				if ($result === false) {
+					throw new \Exception('Could not create tmp folder.');
+				}
 			}
 
 			// Move upload file into data/updaterTmp/
-			$filePath = 'data/' . $folderTmp . '/' . $zipFile['name'];
+			$filePath = $folderTmpPath . '/' . $zipFile['name'];
 			$statMove = move_uploaded_file($zipFile['tmp_name'], $filePath);
 			if(!$statMove) {
 				throw new \Exception('Unable to move uploaded file into data.');
@@ -125,7 +130,7 @@ class AdminController extends Controller {
 			$txtContent = file_get_contents(\OC::$SERVERROOT.'/version-odfweb.txt');
 			$currentVersion = $txtContent ? trim($txtContent) : '0.1';
 
-			$zipTxtContent = file_get_contents('zip://' . \OC::$SERVERROOT . '/' . $filePath .'#odfweb/version-odfweb.txt');
+			$zipTxtContent = file_get_contents('zip://' . $filePath .'#odfweb/version-odfweb.txt');
 			$updateZipVersion = trim($zipTxtContent);
 			if (!$updateZipVersion) {
 				throw new \Exception('Unable to read odfweb version.');
@@ -148,8 +153,8 @@ class AdminController extends Controller {
 		} catch (\Exception $th) {
 
 			// delete updaterTmp/
-			if ($this->rootFolder->nodeExists($folderTmp)) {
-				$this->rootFolder->get($folderTmp)->delete();
+			if (file_exists($folderTmpPath)) {
+				$this->recursiveDelete($folderTmpPath);
 			}
 
 			return new DataResponse([
@@ -159,9 +164,8 @@ class AdminController extends Controller {
 		}
 
 		// 檢查需不需要刪除 step
-		$stepFile = \OC::$SERVERROOT . '/data/updaterOdfweb-' . $this->config->getSystemValue('instanceid') . '/.step';
+		$stepFile = $dataDir . '/updaterOdfweb-' . $instanceId . '/.step';
 		if(file_exists($stepFile)) {
-
 			try {
 				// 如果 step 已經是 12-end -> 刪除
 				$state = file_get_contents($stepFile);
@@ -194,4 +198,45 @@ class AdminController extends Controller {
 		]);
 	}
 
+	/**
+	 * Recursively deletes the specified folder from the system
+	 *
+	 * @param string $folder
+	 * @throws \Exception
+	 */
+	private function recursiveDelete($folder) {
+		if(!file_exists($folder)) {
+			return;
+		}
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS),
+			\RecursiveIteratorIterator::CHILD_FIRST
+		);
+
+		$directories = array();
+		$files = array();
+		foreach ($iterator as $fileInfo) {
+			if ($fileInfo->isDir()) {
+				$directories[] = $fileInfo->getRealPath();
+			} else {
+				if ($fileInfo->isLink()) {
+					$files[] = $fileInfo->getPathName();
+				} else {
+					$files[] = $fileInfo->getRealPath();
+				}
+			}
+		}
+
+		foreach ($files as $file) {
+			unlink($file);
+		}
+		foreach ($directories as $dir) {
+			rmdir($dir);
+		}
+
+		$state = rmdir($folder);
+		if($state === false) {
+			throw new \Exception('Could not rmdir ' . $folder);
+		}
+	}
 }
