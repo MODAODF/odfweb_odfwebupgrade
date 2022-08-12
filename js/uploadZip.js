@@ -10,6 +10,13 @@ window.addEventListener('DOMContentLoaded', function() {
 		pasteZone: null,
 		dropZone: null,
 		beforeSend: function () {
+			const limit = $('#serverLimit').val();
+			const fileSize = this.files[0].size;
+			if (fileSize > limit) {
+				msgResponse.data.message = t(appName, 'The uploaded file exceeds the maximum upload size of the server.');
+				OC.msg.finishedAction(msgEl, msgResponse);
+				return false;
+			}
 			$('#uploadZip').attr('disabled', true);
 			$('.openUpdater').attr('disabled', true);
 			OC.msg.startAction(msgEl, t(appName, 'Verifying the update file...'));
@@ -29,7 +36,9 @@ window.addEventListener('DOMContentLoaded', function() {
 			msgResponse.data.message = resp.data.message;
 		},
 		fail: function (jqXHR, textStatus, errorThrown) {
-			msgResponse.data.message = t(appName, 'Failed to upload.');
+			if (!msgResponse.data.message) {
+				msgResponse.data.message = t(appName, 'Failed to upload.');
+			}
 			console.debug(jqXHR);
 			console.debug(textStatus);
 			console.debug(errorThrown);

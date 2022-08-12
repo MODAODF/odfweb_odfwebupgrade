@@ -4,6 +4,10 @@ script('odfwebupgrade', 'uploadZip');
 ?>
 <div id="odfwebupgrade" class="section">
     <h3><b>Odfweb <?php p($l->t('Upgrade')) ?></b></h3>
+    <p class="settings-hint">
+        <input type="hidden" id="serverLimit" value="<?php p($_['serverLimit']['maxByte']) ?>">
+        (<?php p($l->t('The maximum upload size of the server')) ?> : <?php p($_['serverLimit']['maxString']) ?>)
+    </p>
     <form class="uploadForm" method="post" action="<?php p($_['uploadRoute']) ?>" style="display: inline-block;">
         <span style="font-size:15px;"><?php p($l->t('Select a file (.zip)')) ?></span>
 		<input id="uploadZip" class="fileupload" name="uploadZip" type="file">

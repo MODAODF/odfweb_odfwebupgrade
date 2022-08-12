@@ -22,7 +22,16 @@ class Admin implements ISettings {
 	 */
 	public function getForm(): TemplateResponse {
 		$uploadRoute = $this->urlGenerator->linkToRoute('odfwebupgrade.Admin.uploadZip');
-		return new TemplateResponse('odfwebupgrade', 'admin', ['uploadRoute'=>$uploadRoute]);
+
+		// 伺服器限制提示
+		$iniWrapper = \OC::$server->get(\bantu\IniGetWrapper\IniGetWrapper::class);
+		$uploadMax = $iniWrapper->getBytes('upload_max_filesize');
+		$postMax = $iniWrapper->getBytes('post_max_size');
+		$serverLimit = [
+			'maxByte' => min($uploadMax, $postMax),
+			'maxString' => ($uploadMax < $postMax) ? $iniWrapper->getString('upload_max_filesize') : $iniWrapper->getString('post_max_size'),
+		];
+		return new TemplateResponse('odfwebupgrade', 'admin', ['uploadRoute'=>$uploadRoute, 'serverLimit'=>$serverLimit]);
 	}
 
 	/**
