@@ -10,7 +10,7 @@ script('odfwebupgrade', 'uploadZip');
     </p>
     <form class="uploadForm" method="post" action="<?php p($_['uploadRoute']) ?>" style="display: inline-block;">
         <span style="font-size:15px;"><?php p($l->t('Select a file (.zip)')) ?></span>
-		<input id="uploadZip" class="fileupload" name="uploadZip" type="file">
+		<input id="uploadZip" class="fileupload" name="uploadZip" type="file" aria-label="<?php p($l->t('Upload File')) ?>">
 	</form>
     <button class="button openUpdater" disabled><?php p($l->t('Open updater')) ?></button>
     <span class="msg"></span>

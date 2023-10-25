@@ -21,6 +21,7 @@ OC.L10N.register(
     "Could not read from .step" : "無法讀取 .step",
     "Cannot decode .step JSON data." : "無法解碼 .step 中的 JSON 資料",
     "Could not rmdir .step" : "無法刪除 .step",
-    "Zip uploaded !" : "檔案上傳成功"
+    "Zip uploaded !" : "檔案上傳成功",
+    "Upload File" : "上傳檔案"
 },
 "nplurals=1; plural=0;");
